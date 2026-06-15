@@ -1,40 +1,29 @@
-# TA-048 Redes - Trabajo Práctico 2: SDN / NAT
+# Enrutador NAT/PAT con SDN (Controlador POX)
 
-## Entorno de Trabajo y Ejecución
+Este proyecto implementa un enrutador basado en Redes Definidas por Software (SDN) con capacidades de Traducción de Direcciones de Red y Puertos (NAT/PAT). Utiliza el controlador **POX** y **Mininet** para simular un entorno donde múltiples hosts de una red privada (LAN) pueden comunicarse con una red externa (WAN) compartiendo una única dirección IP pública.
 
-### Requisitos
+## Características Principales
 
-- Python 3
-- Mininet
-- POX controller
+* **Enrutamiento SDN:** Lógica de control centralizada utilizando el controlador POX y el protocolo OpenFlow 1.0.
+* **Mecanismo PAT Dinámico:** Traducción de origen (Source NAT) para el tráfico saliente, asignando dinámicamente un pool de 55.001 puertos (comenzando desde el puerto base 10000).
+* **Gestión de Flujos:** Instalación proactiva y reactiva de reglas de flujo en el switch Open vSwitch (OVS) con tiempos de expiración (`idle_timeout`) para la liberación y reciclaje automático de puertos.
 
-### Instalación de POX
+## Topología de la Red
 
-Clonar el repositorio oficial:
-https://github.com/noxrepo/pox.git
+La simulación consta de tres niveles principales:
+* **Plano de Control:** Controlador POX (`127.0.0.1:6633`).
+* **Plano de Datos:** 1 Switch central OVS (`s1`) que actúa como pasarela/enrutador.
+* **Hosts:**
+  * **Red Pública (WAN):** `h1` (IP: `200.0.0.1/24`) conectado al puerto 1.
+  * **Red Privada (LAN):** `h2`, `h3` y `h4` (Subred `192.168.1.0/24`) conectados a los puertos 2, 3 y 4 respectivamente.
 
-### Ubicación del controlador
+El switch `s1` asume dos identidades lógicas:
+* **Gateway LAN:** `192.168.1.254`
+* **IP Pública WAN:** `200.0.0.254`
 
-El archivo (`protorouter.py`) debe ubicarse en el directorio `pox/ext/`
+## Requisitos Previos
 
-### Ejecución del controlador
+* [Mininet](http://mininet.org/)
+* [Controlador POX](https://github.com/noxrepo/pox)
+* Python
 
-Desde una terminal, ejecutar:  
-`python3 pox/pox.py [log.level --DEBUG] protorouter`
-
-### Ejecución de la topología
-
-En otra terminal, ejecutar:  
-`sudo python3 topo.py`
-
-### Orden de ejecución recomendado
-
-- Iniciar el controlador POX.
-- Ejecutar la topología en Mininet.
-- Verificar que el switch se conecte al controlador.
-
-### Verificación básica
-
-- Iniciar la red.
-- Desde la CLI de Mininet:
-    - Probar conectividad: `h2 ping h1`
